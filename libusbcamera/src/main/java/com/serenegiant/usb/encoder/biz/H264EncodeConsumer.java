@@ -9,7 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.jiangdg.usbcamera.utils.FileUtils;
+import com.mobili.usbcamera.utils.FileUtils;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;

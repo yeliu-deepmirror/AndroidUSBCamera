@@ -40,7 +40,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
 
-import com.jiangdg.usbcamera.utils.FileUtils;
+import com.mobili.usbcamera.utils.FileUtils;
 import com.serenegiant.utils.BuildCheck;
 import com.serenegiant.utils.HandlerThreadHandler;
 

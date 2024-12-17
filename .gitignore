@@ -13,3 +13,5 @@
 /app/src/main/bin
 /app/src/main/gen
 /libusbcamera/src/main/gen
+output
+/app/src/main/cpp/OpenXR.Loader.1.1.43

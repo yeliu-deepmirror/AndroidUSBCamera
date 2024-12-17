@@ -1,4 +1,4 @@
-package com.jiangdg.usbcamera;
+package com.mobili.usbcamera;
 
 import org.junit.Test;
 

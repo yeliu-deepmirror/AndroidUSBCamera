@@ -1,9 +1,9 @@
-package com.jiangdg.usbcamera.application;
+package com.mobili.usbcamera.application;
 
 import android.app.Application;
 
-import com.jiangdg.usbcamera.UVCCameraHelper;
-import com.jiangdg.usbcamera.utils.CrashHandler;
+import com.mobili.usbcamera.UVCCameraHelper;
+import com.mobili.usbcamera.utils.CrashHandler;
 
 /**application class
  *

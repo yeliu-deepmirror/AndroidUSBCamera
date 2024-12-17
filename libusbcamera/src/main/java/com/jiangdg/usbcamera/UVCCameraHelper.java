@@ -1,11 +1,11 @@
-package com.jiangdg.usbcamera;
+package com.mobili.usbcamera;
 
 import android.app.Activity;
 import android.graphics.SurfaceTexture;
 import android.hardware.usb.UsbDevice;
 import android.os.Environment;
 
-import com.jiangdg.libusbcamera.R;
+import com.mobili.libusbcamera.R;
 import org.easydarwin.sw.TxtOverlay;
 import com.serenegiant.usb.DeviceFilter;
 import com.serenegiant.usb.Size;

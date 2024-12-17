@@ -1,4 +1,4 @@
-package com.jiangdg.libusbcamera;
+package com.mobili.libusbcamera;
 
 import org.junit.Test;
 

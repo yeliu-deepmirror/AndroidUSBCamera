@@ -5,7 +5,7 @@ import android.media.MediaFormat;
 import android.os.Build;
 import android.util.Log;
 
-import com.jiangdg.usbcamera.utils.FileUtils;
+import com.mobili.usbcamera.utils.FileUtils;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;

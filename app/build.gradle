@@ -3,12 +3,18 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion rootProject.ext.versionCompiler
     defaultConfig {
-        applicationId "com.jiangdg.usbcamera"
+        applicationId "com.mobili.usbcamera"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.versionTarget
         versionCode rootProject.ext.versionCode
         versionName rootProject.ext.versionNameString
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        externalNativeBuild {
+            cmake {
+                abiFilters 'arm64-v8a'
+                arguments "-DANDROID_STL=c++_shared"
+            }
+        }
     }
     buildTypes {
         release {
@@ -32,4 +38,5 @@ dependencies {
     annotationProcessor 'com.jakewharton:butterknife-compiler:10.2.0'
 
     implementation project(':libusbcamera')
+    implementation 'com.android.support:support-v4:24.0.0'
 }

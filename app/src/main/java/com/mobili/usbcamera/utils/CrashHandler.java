@@ -1,4 +1,4 @@
-package com.jiangdg.usbcamera.utils;
+package com.mobili.usbcamera.utils;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;
@@ -8,7 +8,7 @@ import android.os.Build;
 import android.os.Looper;
 import android.widget.Toast;
 
-import com.jiangdg.usbcamera.application.MyApplication;
+import com.mobili.usbcamera.application.MyApplication;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -22,7 +22,7 @@ import java.util.Map;
 /**
  * UncaughtException handler class
  * 
- * @author jiangdg on 2017/6/27.
+ * @author mobili on 2017/6/27.
  * 
  */
 public class CrashHandler implements UncaughtExceptionHandler {
