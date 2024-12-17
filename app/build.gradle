@@ -9,6 +9,7 @@ android {
         versionCode rootProject.ext.versionCode
         versionName rootProject.ext.versionNameString
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
         externalNativeBuild {
             cmake {
                 abiFilters 'arm64-v8a'
@@ -26,6 +27,12 @@ android {
     compileOptions {
         sourceCompatibility rootProject.ext.javaSourceCompatibility
         targetCompatibility rootProject.ext.javaTargetCompatibility
+    }
+    externalNativeBuild {
+        cmake {
+            version "3.10.2"
+            path file('src/main/cpp/CMakeLists.txt')
+        }
     }
 }
 

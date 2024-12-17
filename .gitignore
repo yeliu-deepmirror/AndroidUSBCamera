@@ -11,7 +11,8 @@
 .tags*
 /libusbcamera/src/main/bin
 /app/src/main/bin
+/app/.cxx
 /app/src/main/gen
 /libusbcamera/src/main/gen
 output
-/app/src/main/cpp/OpenXR.Loader.1.1.43
+/app/src/main/cpp/openxr_loader

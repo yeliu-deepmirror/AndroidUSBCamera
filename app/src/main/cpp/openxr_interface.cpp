@@ -20,29 +20,42 @@ extern "C" JNIEXPORT void JNI_OnUnload(JavaVM* vm, void* reserved) {
 
 
 extern "C" JNIEXPORT jfloatArray JNICALL
-Java_com_mobili_usbcamera_view_USBCameraActivity_getDevicePose(JNIEnv* env, jobject obj) {
+Java_com_mobili_usbcamera_OpenXRInterface_getDevicePose(JNIEnv* env, jobject obj) {
     // Initialize OpenXR instance
     XrInstance instance;
     XrInstanceCreateInfo instanceCreateInfo = { XR_TYPE_INSTANCE_CREATE_INFO };
+    instanceCreateInfo.applicationInfo = { "AppName", 1, "EngineName", 1, XR_CURRENT_API_VERSION };
     xrCreateInstance(&instanceCreateInfo, &instance);
 
-    // Get system ID
+    // Get system
     XrSystemId systemId;
     XrSystemGetInfo systemInfo = { XR_TYPE_SYSTEM_GET_INFO };
     systemInfo.formFactor = XR_FORM_FACTOR_HEAD_MOUNTED_DISPLAY;
     xrGetSystem(instance, &systemInfo, &systemId);
 
-    // Retrieve the current pose
-    XrSpace space; // A space to track device position/orientation
-    XrSpaceCreateInfo spaceCreateInfo = { XR_TYPE_SPACE_CREATE_INFO };
-    xrCreateSpace(instance, &spaceCreateInfo, &space);
+    // Create session
+    XrSession session;
+    XrSessionCreateInfo sessionCreateInfo = { XR_TYPE_SESSION_CREATE_INFO };
+    sessionCreateInfo.systemId = systemId;
+    xrCreateSession(instance, &sessionCreateInfo, &session);
 
-    XrPosef pose;
-    XrTime currentTime;
+    // Create reference space
+    XrReferenceSpaceCreateInfo spaceCreateInfo = { XR_TYPE_REFERENCE_SPACE_CREATE_INFO };
+    spaceCreateInfo.referenceSpaceType = XR_REFERENCE_SPACE_TYPE_LOCAL;
+    spaceCreateInfo.poseInReferenceSpace = { {0, 0, 0, 1}, {0, 0, 0} };
+    XrSpace space;
+    xrCreateReferenceSpace(session, &spaceCreateInfo, &space);
+
+    // Wait for a frame to get the current time
+    XrFrameState frameState = { XR_TYPE_FRAME_STATE };
+    XrFrameWaitInfo frameWaitInfo = { XR_TYPE_FRAME_WAIT_INFO };
+    xrWaitFrame(session, &frameWaitInfo, &frameState);
+
+    // Use frameState.predictedDisplayTime as the current time
     XrSpaceLocation spaceLocation = { XR_TYPE_SPACE_LOCATION };
-    xrLocateSpace(space, space, currentTime, &spaceLocation);
+    xrLocateSpace(space, space, frameState.predictedDisplayTime, &spaceLocation);
 
-    // Return pose to Java
+    // Prepare result
     jfloatArray result = env->NewFloatArray(7);
     jfloat poseData[7] = {
         spaceLocation.pose.orientation.x,
