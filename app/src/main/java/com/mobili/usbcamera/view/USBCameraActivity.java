@@ -133,7 +133,7 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
         ButterKnife.bind(this);
         initView();
 
-        mOpenXR.initializeOpenXR(this, this);
+        // mOpenXR.initializeOpenXR(this, this);
 
         // step.1 initialize UVCCameraHelper
         mUVCCameraView = (CameraViewInterface) mTextureView;
@@ -146,8 +146,8 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
             @Override
             public void onPreviewResult(byte[] nv21Yuv) {
                 Log.d(TAG, "onPreviewResult: "+nv21Yuv.length);
-                float[] pose = mOpenXR.getDevicePose();
-                Log.d("MOBILI", "Pose: " + Arrays.toString(pose));
+                // float[] pose = mOpenXR.getDevicePose();
+                // Log.d("MOBILI", "Pose: " + Arrays.toString(pose));
             }
         });
 
