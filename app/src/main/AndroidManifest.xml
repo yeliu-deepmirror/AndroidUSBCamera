@@ -8,6 +8,16 @@
 
     <uses-feature android:name="android.hardware.usb.host"/>
 
+    <!-- Tell the system this app works in either 3dof or 6dof mode -->
+    <uses-feature
+      android:name="android.hardware.vr.headtracking"
+      android:required="false"
+      android:version="1" />
+
+    <!-- If building externally with the OpenXR loader AAR, this would be merged in automatically. -->
+    <uses-permission android:name="org.khronos.openxr.permission.OPENXR" />
+    <uses-permission android:name="org.khronos.openxr.permission.OPENXR_SYSTEM" />
+
     <application
         android:name=".application.MyApplication"
         android:allowBackup="true"

@@ -12,8 +12,10 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
-package com.dm.metahud;
+package com.mobili.usbcamera.view;
 
+import android.content.Context;
+import android.app.Activity;
 import android.content.res.AssetManager;
 import android.view.Surface;
 
@@ -22,5 +24,6 @@ public class OpenXRInterface {
         System.loadLibrary("openxr_interface"); // Load your native library
     }
 
+    public native long initializeOpenXR(Activity activity, Context context);
     public native float[] getDevicePose();
 }

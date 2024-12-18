@@ -36,6 +36,7 @@ import com.serenegiant.usb.widget.CameraViewInterface;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Arrays;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -47,7 +48,7 @@ import butterknife.ButterKnife;
  */
 
 public class USBCameraActivity extends AppCompatActivity implements CameraDialog.CameraDialogParent, CameraViewInterface.Callback {
-    private static final String TAG = "Debug";
+    private static final String TAG = "MOBILI";
     @BindView(R.id.camera_view)
     public View mTextureView;
     @BindView(R.id.toolbar)
@@ -63,8 +64,10 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
     private CameraViewInterface mUVCCameraView;
     private AlertDialog mDialog;
 
-    private boolean isRequest;
+    private boolean isRequest = false;
     private boolean isPreview;
+
+    private OpenXRInterface mOpenXR = new OpenXRInterface();
 
     private UVCCameraHelper.OnMyDevConnectListener listener = new UVCCameraHelper.OnMyDevConnectListener() {
 
@@ -92,13 +95,12 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
         @Override
         public void onConnectDev(UsbDevice device, boolean isConnected) {
             if (!isConnected) {
-                showShortMsg("fail to connect,please check resolution params");
+                showShortMsg("fail to connect, please check resolution params");
                 isPreview = false;
             } else {
                 isPreview = true;
                 showShortMsg("connecting");
-                // initialize seekbar
-                // need to wait UVCCamera initialize over
+                // initialize seekbar need to wait UVCCamera initialize over
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -131,6 +133,8 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
         ButterKnife.bind(this);
         initView();
 
+        mOpenXR.initializeOpenXR(this, this);
+
         // step.1 initialize UVCCameraHelper
         mUVCCameraView = (CameraViewInterface) mTextureView;
         mUVCCameraView.setCallback(this);
@@ -142,8 +146,14 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
             @Override
             public void onPreviewResult(byte[] nv21Yuv) {
                 Log.d(TAG, "onPreviewResult: "+nv21Yuv.length);
+                float[] pose = mOpenXR.getDevicePose();
+                Log.d("MOBILI", "Pose: " + Arrays.toString(pose));
             }
         });
+
+        // mOpenXR.initializeOpenXR();
+        // float[] pose = mOpenXR.getDevicePose();
+        // Log.d("MOBILI", "Pose: " + Arrays.toString(pose));
     }
 
     private void initView() {
@@ -373,7 +383,7 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
     @Override
     public void onDialogResult(boolean canceled) {
         if (canceled) {
-            showShortMsg("取消操作");
+            showShortMsg("cancel operation");
         }
     }
 

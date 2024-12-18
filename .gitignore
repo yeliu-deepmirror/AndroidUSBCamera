@@ -16,3 +16,4 @@
 /libusbcamera/src/main/gen
 output
 /app/src/main/cpp/openxr_loader
+log.txt
