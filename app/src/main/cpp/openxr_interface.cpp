@@ -27,7 +27,7 @@ JNIEXPORT void JNI_OnUnload(JavaVM* vm, void* reserved) {
     xrDestroySession(m_session_);
   }
   if (m_instance_ != XR_NULL_HANDLE) {
-      xrDestroyInstance(m_instance_);
+    xrDestroyInstance(m_instance_);
   }
 }
 
