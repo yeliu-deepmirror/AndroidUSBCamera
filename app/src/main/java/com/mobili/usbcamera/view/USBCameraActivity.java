@@ -151,15 +151,16 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
         mCameraHelper.setOnPreviewFrameListener(new AbstractUVCCameraHandler.OnPreViewResultListener() {
             @Override
             public void onPreviewResult(byte[] nv21Yuv) {
-                Log.d(TAG, "onPreviewResult: "+nv21Yuv.length);
-                // float[] pose = mOpenXR.getDevicePose();
-                // Log.d("MOBILI", "Pose: " + Arrays.toString(pose));
+                // Log.d(TAG, "onPreviewResult: "+nv21Yuv.length);
+                saveJpgImage(nv21Yuv);
             }
         });
         // stopPreview()
     }
 
-    private boolean getJpgImage(byte[] data) {
+    private boolean saveJpgImage(byte[] data) {
+      long timestamp = System.nanoTime();
+
       int image_width = mCameraHelper.getHandle().getWidth();
       int image_height = mCameraHelper.getHandle().getHeight();
 
@@ -169,9 +170,10 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
       if (!result) {
         return false;
       }
-
       byte[] buffer = bos.toByteArray();
 
+      // save the image to
+      mOpenXR.passImage(timestamp, image_width, image_height, buffer);
       return true;
     }
 
