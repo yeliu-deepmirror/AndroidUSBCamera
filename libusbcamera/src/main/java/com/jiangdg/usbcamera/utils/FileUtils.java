@@ -1,4 +1,4 @@
-package com.jiangdg.usbcamera.utils;
+package com.mobili.usbcamera.utils;
 
 import android.os.Environment;
 

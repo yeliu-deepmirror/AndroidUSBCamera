@@ -36,7 +36,7 @@ ext {
     versionTarget = 27
     // if hope supporting 4.4
     // please modify it to 16
-    minSdkVersion = 21
+    minSdkVersion = 24
     versionCode = 99
     versionNameString = '1.2.1.20200414'
     javaSourceCompatibility = JavaVersion.VERSION_1_8
