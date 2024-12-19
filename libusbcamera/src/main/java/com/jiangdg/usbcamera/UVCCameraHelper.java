@@ -61,6 +61,10 @@ public class UVCCameraHelper {
         return mCameraHelper;
     }
 
+    public UVCCameraHandler getHandle() {
+        return mCameraHandler;
+    }
+
     public void closeCamera() {
         if (mCameraHandler != null) {
             mCameraHandler.close();

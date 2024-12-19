@@ -12,6 +12,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Surface;
 import android.view.View;
+import android.graphics.Bitmap;
+import android.graphics.ImageFormat;
+import android.graphics.Rect;
+import android.graphics.SurfaceTexture;
+import android.graphics.YuvImage;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -37,6 +42,7 @@ import com.serenegiant.usb.widget.CameraViewInterface;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
+import java.io.ByteArrayOutputStream;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -133,7 +139,7 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
         ButterKnife.bind(this);
         initView();
 
-        // mOpenXR.initializeOpenXR(this, this);
+        mOpenXR.initialize(this, this);
 
         // step.1 initialize UVCCameraHelper
         mUVCCameraView = (CameraViewInterface) mTextureView;
@@ -150,10 +156,23 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
                 // Log.d("MOBILI", "Pose: " + Arrays.toString(pose));
             }
         });
+        // stopPreview()
+    }
 
-        // mOpenXR.initializeOpenXR();
-        // float[] pose = mOpenXR.getDevicePose();
-        // Log.d("MOBILI", "Pose: " + Arrays.toString(pose));
+    private boolean getJpgImage(byte[] data) {
+      int image_width = mCameraHelper.getHandle().getWidth();
+      int image_height = mCameraHelper.getHandle().getHeight();
+
+      YuvImage yuvImage = new YuvImage(data, ImageFormat.NV21, image_width, image_height, null);
+      ByteArrayOutputStream bos = new ByteArrayOutputStream(data.length);
+      boolean result = yuvImage.compressToJpeg(new Rect(0, 0, image_width, image_height), 100, bos);
+      if (!result) {
+        return false;
+      }
+
+      byte[] buffer = bos.toByteArray();
+
+      return true;
     }
 
     private void initView() {
@@ -237,7 +256,7 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
                 mCameraHelper.capturePicture(picPath, new AbstractUVCCameraHandler.OnCaptureListener() {
                     @Override
                     public void onCaptureResult(String path) {
-                        if(TextUtils.isEmpty(path)) {
+                        if (TextUtils.isEmpty(path)) {
                             return;
                         }
                         new Handler(getMainLooper()).post(new Runnable() {

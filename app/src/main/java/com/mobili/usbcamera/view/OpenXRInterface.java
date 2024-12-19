@@ -24,6 +24,6 @@ public class OpenXRInterface {
         System.loadLibrary("openxr_interface"); // Load your native library
     }
 
-    public native long initializeOpenXR(Activity activity, Context context);
+    public native long initialize(Activity activity, Context context);
     public native float[] getDevicePose();
 }

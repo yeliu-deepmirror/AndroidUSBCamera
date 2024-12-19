@@ -1,7 +1,18 @@
 cmake_minimum_required(VERSION 3.10.2)
 
-add_library(openxr_interface SHARED openxr_interface.cpp)
 
 find_library(log-lib log)
 
-target_link_libraries(openxr_interface ${log-lib})
+include_directories(${CMAKE_SOURCE_DIR}/grpc_stream_api/include)
+add_library(grpc_stream_api SHARED IMPORTED)
+set_target_properties(grpc_stream_api PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/grpc_stream_api/${ANDROID_ABI}/libgrpc_stream_api.so)
+
+include_directories(${CMAKE_SOURCE_DIR})
+
+
+add_library(openxr_interface SHARED openxr_interface.cpp)
+
+target_link_libraries(openxr_interface
+  ${log-lib}
+  grpc_stream_api
+)
