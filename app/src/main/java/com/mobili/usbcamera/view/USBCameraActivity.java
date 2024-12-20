@@ -158,7 +158,6 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
                 saveJpgImage(nv21Yuv);
             }
         });
-
         // Set the listener for the switch
         mSwitchPreview.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
