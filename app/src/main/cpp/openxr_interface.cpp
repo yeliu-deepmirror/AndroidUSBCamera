@@ -1,7 +1,10 @@
-#include "utils/android_log.h"
+
+
+#include "common/redirect_android_log.h"
 #include <jni.h>
 #include <cstring>
 #include <vector>
+#include "grpc_stream_api.h"
 
 JavaVM* vm_ = nullptr;
 
@@ -13,16 +16,25 @@ extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved) {
     return JNI_ERR;
   }
   vm_ = vm;
+
+  dm::xr::RunLoggingThread();
   return JNI_VERSION_1_6;
 }
 
 JNIEXPORT void JNI_OnUnload(JavaVM* vm, void* reserved) {
+  dm::StopService();
 }
 
-// https://github.com/deepmirrorinc/MobiliService/blob/39b9c7278d81482d4d6013b6ae87a3ace90e4b69/test/jni/car_pose.cc#L173
-// Initialize OpenXR
+// Initialize
 extern "C" JNIEXPORT jlong JNICALL
-Java_com_mobili_usbcamera_view_OpenXRInterface_initializeOpenXR(JNIEnv* env, jobject obj, jobject activity, jobject context) {
+Java_com_mobili_usbcamera_view_OpenXRInterface_initialize(JNIEnv* env, jobject obj, jobject activity, jobject context) {
+
+  LOGI("OpenXRInterface_initialize");
+
+  dm::ServiceConfig config;
+  config.port = 15212;
+  dm::StartService(config);
+
   return 0;
 }
 
@@ -34,4 +46,19 @@ Java_com_mobili_usbcamera_view_OpenXRInterface_getDevicePose(JNIEnv* env, jobjec
   jfloat poseData[7] = {0, 0, 0, 0, 0, 0, 0};
   env->SetFloatArrayRegion(resultArray, 0, 7, poseData);
   return resultArray;
+}
+
+// public native void passImage(int image_width, int image_height, byte[] byteArray);
+extern "C" JNIEXPORT void JNICALL
+Java_com_mobili_usbcamera_view_OpenXRInterface_passImage(JNIEnv* env, jobject obj, jlong timestamp, jint image_width, jint image_height, jbyteArray byteArray) {
+
+  // Get the length of the byte array
+   jsize byteArrayLength = env->GetArrayLength(byteArray);
+
+   // Create a buffer to store the byte array
+   char* buffer = new char[byteArrayLength + 1];
+   // Copy the byte array into the buffer
+   env->GetByteArrayRegion(byteArray, 0, byteArrayLength, reinterpret_cast<jbyte*>(buffer));
+
+   dm::PushImage(timestamp, image_width, image_height, (uint8_t*)buffer, byteArrayLength);
 }
