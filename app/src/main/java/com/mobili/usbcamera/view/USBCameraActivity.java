@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -143,6 +144,15 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
         initView();
 
         mOpenXR.initialize(this, this);
+
+        // upload the marker image
+        try {
+            byte[] jpgBytes = mOpenXR.getJpgBytesFromAssets(this, "dm_final.jpg");
+            Log.d(TAG, "Raw Bytes: " + jpgBytes.length);
+            mOpenXR.passMarker(jpgBytes);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         // step.1 initialize UVCCameraHelper
         mUVCCameraView = (CameraViewInterface) mTextureView;
