@@ -23,6 +23,7 @@ import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.Toast;
+import android.widget.CompoundButton;
 import com.mobili.usbcamera.R;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -43,6 +44,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -65,6 +67,8 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
     public SeekBar mSeekContrast;
     @BindView(R.id.switch_rec_voice)
     public Switch mSwitchVoice;
+    @BindView(R.id.switch_rec_preview)
+    public Switch mSwitchPreview;
 
     private UVCCameraHelper mCameraHelper;
     private CameraViewInterface mUVCCameraView;
@@ -141,6 +145,15 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
 
         mOpenXR.initialize(this, this);
 
+        // upload the marker image
+        try {
+            byte[] jpgBytes = mOpenXR.getJpgBytesFromAssets(this, "dm_final.jpg");
+            Log.d(TAG, "Raw Bytes: " + jpgBytes.length);
+            mOpenXR.passMarker(jpgBytes);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         // step.1 initialize UVCCameraHelper
         mUVCCameraView = (CameraViewInterface) mTextureView;
         mUVCCameraView.setCallback(this);
@@ -155,7 +168,22 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
                 saveJpgImage(nv21Yuv);
             }
         });
-        // stopPreview()
+        // Set the listener for the switch
+        mSwitchPreview.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                // Handle the switch state change here
+                if (isChecked) {
+                    // Switch is enabled
+                    mCameraHelper.startPreview(mUVCCameraView);
+                    isPreview = true;
+                } else {
+                    // Switch is disabled
+                    mCameraHelper.getHandle().stopPreview();
+                    isPreview = false;
+                }
+            }
+        });
     }
 
     private boolean saveJpgImage(byte[] data) {

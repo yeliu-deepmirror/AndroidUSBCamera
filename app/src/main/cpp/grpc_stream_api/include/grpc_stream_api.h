@@ -13,13 +13,19 @@ namespace dm {
 struct ServiceConfig {
   int port;
   std::string tag = "[MOBILI] ";
+
+  int64_t marker_process_interval = 2e8;
 };
 
 void StartService(const ServiceConfig& config);
 void StopService();
 
-
 void PushImage(int64_t timestamp, int width, int height, uint8_t* data, size_t data_length);
+void PushImage(int64_t timestamp, int width, int height, uint8_t* data, size_t data_length,
+               float fx, float fy, float cx, float cy);
+
+// for marker detection
+void SetMarkerWithJPG(float marker_real_width, uint8_t* data, size_t data_length);
 
 }  // namespace dm
 
