@@ -4,7 +4,7 @@ import android.hardware.usb.UsbDevice;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-
+import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -187,7 +187,7 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
     }
 
     private boolean saveJpgImage(byte[] data) {
-      long timestamp = System.nanoTime();
+      long timestamp = SystemClock.elapsedRealtimeNanos();
 
       int image_width = mCameraHelper.getHandle().getWidth();
       int image_height = mCameraHelper.getHandle().getHeight();

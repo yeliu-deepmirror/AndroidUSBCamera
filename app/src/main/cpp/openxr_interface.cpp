@@ -32,7 +32,8 @@ Java_com_mobili_usbcamera_view_OpenXRInterface_initialize(JNIEnv* env, jobject o
   LOGI("OpenXRInterface_initialize");
 
   dm::ServiceConfig config;
-  config.port = 15212;
+  config.grpc_port = 15212;
+  config.websocket_port = 15211;
   dm::StartService(config);
 
   return 0;

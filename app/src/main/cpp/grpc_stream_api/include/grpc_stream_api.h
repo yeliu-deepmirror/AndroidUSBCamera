@@ -11,7 +11,8 @@ namespace dm {
 
 // use grpc to stream images
 struct ServiceConfig {
-  int port;
+  int grpc_port;
+  int websocket_port;
   std::string tag = "[MOBILI] ";
 
   int64_t marker_process_interval = 2e8;
