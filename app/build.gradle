@@ -46,4 +46,5 @@ dependencies {
 
     implementation project(':libusbcamera')
     implementation 'com.android.support:support-v4:24.0.0'
+    implementation 'org.jmdns:jmdns:3.5.8'
 }

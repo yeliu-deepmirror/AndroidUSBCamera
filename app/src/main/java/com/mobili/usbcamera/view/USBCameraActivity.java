@@ -49,6 +49,9 @@ import java.io.IOException;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import com.mobili.usbcamera.utils.MDNSHelper;
+import com.mobili.usbcamera.utils.FileReaderUtils;
+
 /**
  * UVCCamera use demo
  * <p>
@@ -78,6 +81,7 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
     private boolean isPreview;
 
     private OpenXRInterface mOpenXR = new OpenXRInterface();
+    private MDNSHelper mdnsHelper = new MDNSHelper();
 
     private UVCCameraHelper.OnMyDevConnectListener listener = new UVCCameraHelper.OnMyDevConnectListener() {
 
@@ -184,7 +188,20 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
                 }
             }
         });
+
+        // Start the mDNS service
+        // mdnsHelper.stop();
+        String mobili_id = FileReaderUtils.readMobiliIdFromExternalStorage();
+        boolean success = mdnsHelper.begin(mobili_id, "MyService", "_http._tcp.local.", 8080);
+        if (success) {
+            showShortMsg("mDNS started " + mobili_id + " successfully.");
+        } else {
+            showShortMsg("Failed to start mDNS.");
+        }
+        // Stop the mDNS service when no longer needed
+        // mdnsHelper.stop();
     }
+
 
     private boolean saveJpgImage(byte[] data) {
       long timestamp = SystemClock.elapsedRealtimeNanos();
@@ -413,6 +430,7 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        mdnsHelper.stop();
         FileUtils.releaseFile();
         // step.4 release uvc camera resources
         if (mCameraHelper != null) {
