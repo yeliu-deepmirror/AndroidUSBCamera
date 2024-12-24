@@ -1,5 +1,6 @@
 package com.mobili.usbcamera.view;
 
+import android.content.Intent;
 import android.hardware.usb.UsbDevice;
 import android.os.Bundle;
 import android.os.Handler;
@@ -40,6 +41,7 @@ import com.serenegiant.usb.USBMonitor;
 import com.serenegiant.usb.common.AbstractUVCCameraHandler;
 import com.serenegiant.usb.encoder.RecordParams;
 import com.serenegiant.usb.widget.CameraViewInterface;
+import com.serenegiant.usb.widget.UVCCameraTextureView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,6 +54,7 @@ import butterknife.ButterKnife;
 
 import com.mobili.usbcamera.utils.MDNSHelper;
 import com.mobili.usbcamera.utils.FileReaderUtils;
+import com.mobili.usbcamera.utils.MyForegroundService;
 
 /**
  * UVCCamera use demo
@@ -79,6 +82,7 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
     public OverlayView mOverlayView;
     private UVCCameraHelper mCameraHelper;
     private CameraViewInterface mUVCCameraView;
+    private UVCCameraTextureView mUVCCameraViewInternal;
     private AlertDialog mDialog;
 
     private boolean isRequest = false;
@@ -166,6 +170,9 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
         mOverlayView = findViewById(R.id.overlay_view);
 
         // step.1 initialize UVCCameraHelper
+        mUVCCameraViewInternal = (UVCCameraTextureView) mTextureView;
+        mUVCCameraViewInternal.setKeepRunning(true);
+
         mUVCCameraView = (CameraViewInterface) mTextureView;
         mUVCCameraView.setCallback(this);
         mCameraHelper = UVCCameraHelper.getInstance();
@@ -210,6 +217,9 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
         }
         // Stop the mDNS service when no longer needed
         // mdnsHelper.stop();
+
+        Intent serviceIntent = new Intent(this, MyForegroundService.class);
+        startService(serviceIntent);
     }
 
     public String getStatusString(long status) {
