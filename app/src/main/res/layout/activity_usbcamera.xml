@@ -27,6 +27,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"/>
+        <com.mobili.usbcamera.view.OverlayView
+            android:id="@+id/overlay_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"/>
     </FrameLayout>
 
     <LinearLayout
@@ -107,6 +112,14 @@
         android:layout_marginTop="50dp"
         android:checked="true"
         android:text="Preview"
+        android:textColor="@color/colorWhite" />
+
+    <TextView
+        android:id="@+id/text_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/toolbar"
+        android:text="test"
         android:textColor="@color/colorWhite" />
 
 </RelativeLayout>

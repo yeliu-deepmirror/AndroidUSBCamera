@@ -1,10 +1,11 @@
 package com.mobili.usbcamera.view;
 
+import android.content.Intent;
 import android.hardware.usb.UsbDevice;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-
+import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,6 +21,7 @@ import android.graphics.YuvImage;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.Toast;
@@ -39,6 +41,7 @@ import com.serenegiant.usb.USBMonitor;
 import com.serenegiant.usb.common.AbstractUVCCameraHandler;
 import com.serenegiant.usb.encoder.RecordParams;
 import com.serenegiant.usb.widget.CameraViewInterface;
+import com.serenegiant.usb.widget.UVCCameraTextureView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +51,10 @@ import java.io.IOException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import com.mobili.usbcamera.utils.MDNSHelper;
+import com.mobili.usbcamera.utils.FileReaderUtils;
+import com.mobili.usbcamera.utils.MyForegroundService;
 
 /**
  * UVCCamera use demo
@@ -69,15 +76,20 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
     public Switch mSwitchVoice;
     @BindView(R.id.switch_rec_preview)
     public Switch mSwitchPreview;
+    @BindView(R.id.text_status)
+    public TextView mStatusText;
 
+    public OverlayView mOverlayView;
     private UVCCameraHelper mCameraHelper;
     private CameraViewInterface mUVCCameraView;
+    private UVCCameraTextureView mUVCCameraViewInternal;
     private AlertDialog mDialog;
 
     private boolean isRequest = false;
     private boolean isPreview;
 
     private OpenXRInterface mOpenXR = new OpenXRInterface();
+    private MDNSHelper mdnsHelper = new MDNSHelper();
 
     private UVCCameraHelper.OnMyDevConnectListener listener = new UVCCameraHelper.OnMyDevConnectListener() {
 
@@ -154,16 +166,25 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
             e.printStackTrace();
         }
 
+        // mOverlayView
+        mOverlayView = findViewById(R.id.overlay_view);
+
         // step.1 initialize UVCCameraHelper
+        mUVCCameraViewInternal = (UVCCameraTextureView) mTextureView;
+        mUVCCameraViewInternal.setKeepRunning(true);
+
         mUVCCameraView = (CameraViewInterface) mTextureView;
         mUVCCameraView.setCallback(this);
         mCameraHelper = UVCCameraHelper.getInstance();
-        mCameraHelper.setDefaultFrameFormat(UVCCameraHelper.FRAME_FORMAT_MJPEG);
+        mCameraHelper.setDefaultFrameFormat(UVCCameraHelper.FRAME_FORMAT_YUYV);
+        // mCameraHelper.setDefaultFrameFormat(UVCCameraHelper.FRAME_FORMAT_MJPEG);
         mCameraHelper.initUSBMonitor(this, mUVCCameraView, listener);
 
         mCameraHelper.setOnPreviewFrameListener(new AbstractUVCCameraHandler.OnPreViewResultListener() {
             @Override
             public void onPreviewResult(byte[] nv21Yuv) {
+                setStatusText();
+                drawAxis();
                 // Log.d(TAG, "onPreviewResult: "+nv21Yuv.length);
                 saveJpgImage(nv21Yuv);
             }
@@ -184,10 +205,61 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
                 }
             }
         });
+
+        // Start the mDNS service
+        // mdnsHelper.stop();
+        String mobili_id = FileReaderUtils.readMobiliIdFromExternalStorage();
+        boolean success = mdnsHelper.begin(mobili_id, "MyService", "_http._tcp.local.", 8080);
+        if (success) {
+            showShortMsg("mDNS started " + mobili_id + " successfully.");
+        } else {
+            showShortMsg("Failed to start mDNS.");
+        }
+        // Stop the mDNS service when no longer needed
+        // mdnsHelper.stop();
+
+        Intent serviceIntent = new Intent(this, MyForegroundService.class);
+        startService(serviceIntent);
+    }
+
+    public String getStatusString(long status) {
+        switch ((int) status) {
+            case -2:
+                return "not initialized";
+            case -1:
+                return "image not received yet";
+            case 0:
+                return "marker not localized yet";
+            case 1:
+                return "estimator got nothing";
+            case 2:
+                return "XR pose received but not localized yet";
+            case 3:
+                return "XR pose received and localize success";
+            default:
+                return "unknown status";
+        }
+    }
+
+    private void setStatusText() {
+      long status = mOpenXR.getStatus();
+      String message = getStatusString(status);
+      mStatusText.setText(message);
+    }
+
+    private void drawAxis() {
+      mOverlayView.setCenterImageHeight(mTextureView.getHeight());
+
+      float[] pts = mOpenXR.getMarkerLocation();
+      if (pts[8] > 0) {
+        mOverlayView.addLineX(pts[0], pts[1], pts[2], pts[3]);
+        mOverlayView.addLineY(pts[0], pts[1], pts[4], pts[5]);
+        mOverlayView.addLineZ(pts[0], pts[1], pts[6], pts[7]);
+      }
     }
 
     private boolean saveJpgImage(byte[] data) {
-      long timestamp = System.nanoTime();
+      long timestamp = SystemClock.elapsedRealtimeNanos();
 
       int image_width = mCameraHelper.getHandle().getWidth();
       int image_height = mCameraHelper.getHandle().getHeight();
@@ -413,6 +485,7 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        mdnsHelper.stop();
         FileUtils.releaseFile();
         // step.4 release uvc camera resources
         if (mCameraHelper != null) {

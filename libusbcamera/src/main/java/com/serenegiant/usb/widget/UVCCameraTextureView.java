@@ -52,7 +52,7 @@ public class UVCCameraTextureView extends AspectRatioTextureView    // API >= 14
 	implements TextureView.SurfaceTextureListener, CameraViewInterface {
 
 	private static final boolean DEBUG = true;	// TODO set false on release
-	private static final String TAG = "UVCCameraTextureView";
+	private static final String TAG = "[MOBILI] UVCCameraTextureView";
 
     private boolean mHasSurface;
 	private RenderHandler mRenderHandler;
@@ -61,7 +61,7 @@ public class UVCCameraTextureView extends AspectRatioTextureView    // API >= 14
     private boolean mReqesutCaptureStillImage;
 	private Callback mCallback;
 	// Camera分辨率宽度
-
+	private boolean mKeepRunning = false;
 
 	/** for calculation of frame rate */
 	private final FpsCounter mFpsCounter = new FpsCounter();
@@ -79,9 +79,14 @@ public class UVCCameraTextureView extends AspectRatioTextureView    // API >= 14
 		setSurfaceTextureListener(this);
 	}
 
+	public void setKeepRunning(boolean value) {
+		mKeepRunning = value;
+	}
+
 	@Override
 	public void onResume() {
 		if (DEBUG) Log.v(TAG, "onResume:");
+		if (mKeepRunning) return;
 		if (mHasSurface) {
 			mRenderHandler = RenderHandler.createHandler(mFpsCounter, super.getSurfaceTexture(), getWidth(), getHeight());
 		}
@@ -90,6 +95,8 @@ public class UVCCameraTextureView extends AspectRatioTextureView    // API >= 14
 	@Override
 	public void onPause() {
 		if (DEBUG) Log.v(TAG, "onPause:");
+		if (mKeepRunning) return;
+
 		if (mRenderHandler != null) {
 			mRenderHandler.release();
 			mRenderHandler = null;
@@ -215,7 +222,7 @@ public class UVCCameraTextureView extends AspectRatioTextureView    // API >= 14
 	public void resetFps() {
 		mFpsCounter.reset();
 	}
-	
+
 	/** update frame rate of image processing */
 	public void updateFps() {
 		mFpsCounter.update();
@@ -257,7 +264,7 @@ public class UVCCameraTextureView extends AspectRatioTextureView    // API >= 14
 
 		public static final RenderHandler createHandler(final FpsCounter counter,
 			final SurfaceTexture surface, final int width, final int height) {
-			
+
 			final RenderThread thread = new RenderThread(counter, surface, width, height);
 			thread.start();
 			return thread.getHandler();

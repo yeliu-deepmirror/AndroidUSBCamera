@@ -33,6 +33,9 @@ public class OpenXRInterface {
     public native float[] getDevicePose();
     public native void passImage(long timestamp, int image_width, int image_height, byte[] byteArray);
     public native void passMarker(byte[] byteArray);
+    public native long getStatus();
+    public native float[] getMarkerLocation();
+
 
     public static byte[] getJpgBytesFromAssets(Context context, String assetFileName) throws IOException {
         // Open InputStream for the asset
