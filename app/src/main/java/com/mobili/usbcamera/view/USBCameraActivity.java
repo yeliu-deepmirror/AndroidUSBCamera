@@ -20,6 +20,7 @@ import android.graphics.YuvImage;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.Toast;
@@ -72,7 +73,10 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
     public Switch mSwitchVoice;
     @BindView(R.id.switch_rec_preview)
     public Switch mSwitchPreview;
+    @BindView(R.id.text_status)
+    public TextView mStatusText;
 
+    public OverlayView mOverlayView;
     private UVCCameraHelper mCameraHelper;
     private CameraViewInterface mUVCCameraView;
     private AlertDialog mDialog;
@@ -158,6 +162,9 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
             e.printStackTrace();
         }
 
+        // mOverlayView
+        mOverlayView = findViewById(R.id.overlay_view);
+
         // step.1 initialize UVCCameraHelper
         mUVCCameraView = (CameraViewInterface) mTextureView;
         mUVCCameraView.setCallback(this);
@@ -169,6 +176,8 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
         mCameraHelper.setOnPreviewFrameListener(new AbstractUVCCameraHandler.OnPreViewResultListener() {
             @Override
             public void onPreviewResult(byte[] nv21Yuv) {
+                setStatusText();
+                drawAxis();
                 // Log.d(TAG, "onPreviewResult: "+nv21Yuv.length);
                 saveJpgImage(nv21Yuv);
             }
@@ -203,6 +212,41 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
         // mdnsHelper.stop();
     }
 
+    public String getStatusString(long status) {
+        switch ((int) status) {
+            case -2:
+                return "not initialized";
+            case -1:
+                return "image not received yet";
+            case 0:
+                return "marker not localized yet";
+            case 1:
+                return "estimator got nothing";
+            case 2:
+                return "XR pose received but not localized yet";
+            case 3:
+                return "XR pose received and localize success";
+            default:
+                return "unknown status";
+        }
+    }
+
+    private void setStatusText() {
+      long status = mOpenXR.getStatus();
+      String message = getStatusString(status);
+      mStatusText.setText(message);
+    }
+
+    private void drawAxis() {
+      mOverlayView.setCenterImageHeight(mTextureView.getHeight());
+
+      float[] pts = mOpenXR.getMarkerLocation();
+      if (pts[8] > 0) {
+        mOverlayView.addLineX(pts[0], pts[1], pts[2], pts[3]);
+        mOverlayView.addLineY(pts[0], pts[1], pts[4], pts[5]);
+        mOverlayView.addLineZ(pts[0], pts[1], pts[6], pts[7]);
+      }
+    }
 
     private boolean saveJpgImage(byte[] data) {
       long timestamp = SystemClock.elapsedRealtimeNanos();

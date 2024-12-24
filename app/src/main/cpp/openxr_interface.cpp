@@ -79,3 +79,35 @@ Java_com_mobili_usbcamera_view_OpenXRInterface_passImage(JNIEnv* env, jobject ob
    dm::PushImage(timestamp, image_width, image_height, (uint8_t*)buffer, byteArrayLength,
                  600, 600, image_width * 0.5, image_height * 0.5);
 }
+
+extern "C" JNIEXPORT jlong JNICALL
+Java_com_mobili_usbcamera_view_OpenXRInterface_getStatus(JNIEnv* env, jobject obj) {
+  return dm::GetCurrentStatus();
+}
+
+extern "C" JNIEXPORT jfloatArray JNICALL
+Java_com_mobili_usbcamera_view_OpenXRInterface_getMarkerLocation(JNIEnv* env, jobject obj) {
+  jfloat poseData[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+  // get the result;
+  // get the latest marker location, used for debug render
+  // bool GetLatestLocalization(int64_t* timestamp, std::vector<std::pair<float, float>>* points);
+  int64_t timestamp;
+  std::vector<std::pair<float, float>> points;
+  if (dm::GetLatestLocalization(&timestamp, &points) && points.size() == 4) {
+    for (size_t i = 0; i < 4; i++) {
+      poseData[2 * i] = points[i].first;
+      poseData[2 * i + 1] = points[i].second;
+    }
+    static int64_t last_update = 0;
+    if (timestamp > last_update) {
+      poseData[8] = 1;
+      last_update = timestamp;
+    }
+  }
+
+  // Prepare result
+  jfloatArray resultArray = env->NewFloatArray(9);
+  env->SetFloatArrayRegion(resultArray, 0, 9, poseData);
+  return resultArray;
+}
