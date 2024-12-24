@@ -39,7 +39,7 @@ public class AspectRatioTextureView extends TextureView	// API >= 14
 	implements IAspectRatioView {
 
 	private static final boolean DEBUG = true;	// TODO set false on release
-	private static final String TAG = "AbstractCameraView";
+	private static final String TAG = "[MOBILI] AbstractCameraView";
 
     private double mRequestedAspect = -1.0;
 	private CameraViewInterface.Callback mCallback;

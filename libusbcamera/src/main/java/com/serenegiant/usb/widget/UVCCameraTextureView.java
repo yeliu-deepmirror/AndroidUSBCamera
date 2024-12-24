@@ -52,7 +52,7 @@ public class UVCCameraTextureView extends AspectRatioTextureView    // API >= 14
 	implements TextureView.SurfaceTextureListener, CameraViewInterface {
 
 	private static final boolean DEBUG = true;	// TODO set false on release
-	private static final String TAG = "UVCCameraTextureView";
+	private static final String TAG = "[MOBILI] UVCCameraTextureView";
 
     private boolean mHasSurface;
 	private RenderHandler mRenderHandler;
@@ -215,7 +215,7 @@ public class UVCCameraTextureView extends AspectRatioTextureView    // API >= 14
 	public void resetFps() {
 		mFpsCounter.reset();
 	}
-	
+
 	/** update frame rate of image processing */
 	public void updateFps() {
 		mFpsCounter.update();
@@ -257,7 +257,7 @@ public class UVCCameraTextureView extends AspectRatioTextureView    // API >= 14
 
 		public static final RenderHandler createHandler(final FpsCounter counter,
 			final SurfaceTexture surface, final int width, final int height) {
-			
+
 			final RenderThread thread = new RenderThread(counter, surface, width, height);
 			thread.start();
 			return thread.getHandler();
