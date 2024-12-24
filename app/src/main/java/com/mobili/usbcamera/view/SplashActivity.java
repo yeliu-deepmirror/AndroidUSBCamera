@@ -6,6 +6,10 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.PowerManager;
+import android.provider.Settings;
+import android.net.Uri;
+
 import android.util.Log;
 import android.view.WindowManager;
 import android.widget.Toast;
@@ -43,6 +47,12 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_splash);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (!isIgnoringBatteryOptimizations()) {
+                requestIgnoreBatteryOptimizations();
+            }
+        }
 
         if (isVersionM()) {
             checkAndRequestPermissions();
@@ -100,5 +110,20 @@ public class SplashActivity extends AppCompatActivity {
                 SplashActivity.this.finish();
             }
         }, 500);
+    }
+
+    private boolean isIgnoringBatteryOptimizations() {
+        String packageName = getPackageName();
+        PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
+        if (pm != null) {
+            return pm.isIgnoringBatteryOptimizations(packageName);
+        }
+        return false;
+    }
+
+    private void requestIgnoreBatteryOptimizations() {
+        Intent intent = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+        intent.setData(Uri.parse("package:" + getPackageName()));
+        startActivity(intent);
     }
 }
