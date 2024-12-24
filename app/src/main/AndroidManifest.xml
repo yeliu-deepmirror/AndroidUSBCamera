@@ -35,8 +35,17 @@
             </intent-filter>
         </activity>
         <service
-            android:name=".MyForegroundService"
-            android:exported="false" />
+            android:name=".utils.MyVrListenerService"
+            android:enabled="true"
+            android:permission="android.permission.BIND_VR_LISTENER_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.vr.VrListenerService" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name=".utils.MyForegroundService"
+            android:enabled="true" />
     </application>
 
 </manifest>
