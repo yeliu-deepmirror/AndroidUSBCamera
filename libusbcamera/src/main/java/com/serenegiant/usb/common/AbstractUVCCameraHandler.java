@@ -59,7 +59,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 public abstract class AbstractUVCCameraHandler extends Handler {
 
     private static final boolean DEBUG = true;    // TODO set false on release
-    private static final String TAG = "AbsUVCCameraHandler";
+    private static final String TAG = "[MOBILI] AbsUVCCameraHandler";
 
 
     // 对外回调接口
@@ -393,7 +393,7 @@ public abstract class AbstractUVCCameraHandler extends Handler {
     }
 
     public static final class CameraThread extends Thread {
-        private static final String TAG_THREAD = "CameraThread";
+        private static final String TAG_THREAD = "[MOBILI] CameraThread";
         private final Object mSync = new Object();
         private final Class<? extends AbstractUVCCameraHandler> mHandlerClass;
         private final WeakReference<Activity> mWeakParent;
@@ -543,10 +543,14 @@ public abstract class AbstractUVCCameraHandler extends Handler {
             if (DEBUG) Log.v(TAG_THREAD, "handleStartPreview:");
             if ((mUVCCamera == null) || mIsPreviewing) return;
             try {
+                if (DEBUG) {
+                  Log.v(TAG_THREAD, "preview size " + String.valueOf(mWidth) + "*" + String.valueOf(mHeight));
+                  Log.v(TAG_THREAD, "preview parameter " + String.valueOf(mPreviewMode) + ", " + String.valueOf(mBandwidthFactor));
+                }
                 mUVCCamera.setPreviewSize(mWidth, mHeight, 1, 31, mPreviewMode, mBandwidthFactor);
                 // 获取USB Camera预览数据，使用NV21颜色会失真
                 // 无论使用YUV还是MPEG，setFrameCallback的设置效果一致
-//				mUVCCamera.setFrameCallback(mIFrameCallback, UVCCamera.PIXEL_FORMAT_NV21);
+                // mUVCCamera.setFrameCallback(mIFrameCallback, UVCCamera.PIXEL_FORMAT_NV21);
                 mUVCCamera.setFrameCallback(mIFrameCallback, UVCCamera.PIXEL_FORMAT_YUV420SP);
             } catch (final IllegalArgumentException e) {
                 try {
