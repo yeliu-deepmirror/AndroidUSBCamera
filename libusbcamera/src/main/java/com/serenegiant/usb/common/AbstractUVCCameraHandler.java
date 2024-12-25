@@ -333,6 +333,20 @@ public abstract class AbstractUVCCameraHandler extends Handler {
         throw new IllegalStateException();
     }
 
+    public int getFocus() {
+      checkReleased();
+      final CameraThread thread = mWeakThread.get();
+      final UVCCamera camera = thread != null ? thread.mUVCCamera : null;
+      if (camera != null) {
+        boolean auto_focus = camera.getAutoFocus();
+        boolean support_focus_change = camera.checkSupportFlag(UVCCamera.CTRL_FOCUS_AUTO);
+        int current_focus = camera.getFocus();
+        Log.v(TAG, "auto_focus: " + auto_focus + ", support_focus_change: " + support_focus_change + ", current_focus: " + current_focus);
+        return current_focus;
+      }
+      throw new IllegalStateException();
+    }
+
     public int resetValue(final int flag) {
         checkReleased();
         final CameraThread thread = mWeakThread.get();
@@ -911,11 +925,13 @@ public abstract class AbstractUVCCameraHandler extends Handler {
         }
 
         // 自动对焦
+        private boolean mSetAutoFocus = false;
         public void handleCameraFoucs() {
-            if (DEBUG) Log.v(TAG_THREAD, "handleStartPreview:");
+            if (DEBUG) Log.v(TAG_THREAD, "mSetAutoFocus:" + mSetAutoFocus);
             if ((mUVCCamera == null) || !mIsPreviewing)
                 return;
-            mUVCCamera.setAutoFocus(true);
+            mUVCCamera.setAutoFocus(mSetAutoFocus);
+            mSetAutoFocus = !mSetAutoFocus;
         }
 
         // 获取支持的分辨率
