@@ -159,7 +159,7 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
         // upload the marker image
         try {
             byte[] jpgBytes = mOpenXR.getJpgBytesFromAssets(this, "dm_final.jpg");
-            Log.d(TAG, "Raw Bytes: " + jpgBytes.length);
+            Log.d(TAG, "Read Marker image, Raw Bytes: " + jpgBytes.length);
             mOpenXR.passMarker(jpgBytes);
         } catch (IOException e) {
             e.printStackTrace();
