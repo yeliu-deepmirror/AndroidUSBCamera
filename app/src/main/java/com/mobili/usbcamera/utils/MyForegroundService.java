@@ -24,8 +24,8 @@ public class MyForegroundService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle("App is Running")
-                .setContentText("Your app is running in the background")
-                .setSmallIcon(R.drawable.ic_notification)
+                .setContentText("Android USB camera app is running in the background")
+                .setSmallIcon(R.mipmap.ic_launcher)
                 .build();
 
         startForeground(1, notification);

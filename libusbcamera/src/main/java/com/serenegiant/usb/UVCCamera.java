@@ -188,40 +188,31 @@ public class UVCCamera {
      */
     public synchronized void open(final UsbControlBlock ctrlBlock) {
     	int result = -2;
-		StringBuilder sb = new StringBuilder();
-    	try {
-			mCtrlBlock = ctrlBlock.clone();
-			result = nativeConnect(mNativePtr,
-				mCtrlBlock.getVenderId(), mCtrlBlock.getProductId(),
-				mCtrlBlock.getFileDescriptor(),
-				mCtrlBlock.getBusNum(),
-				mCtrlBlock.getDevNum(),
-				getUSBFSName(mCtrlBlock));
-			sb.append("调用nativeConnect返回值："+result);
-//			long id_camera, int venderId, int productId, int fileDescriptor, int busNum, int devAddr, String usbfs
-		} catch (final Exception e) {
-			Log.w(TAG, e);
-			for(int i = 0; i< e.getStackTrace().length; i++){
-				sb.append(e.getStackTrace()[i].toString());
-				sb.append("\n");
+	    	try {
+				mCtrlBlock = ctrlBlock.clone();
+				result = nativeConnect(mNativePtr,
+					mCtrlBlock.getVenderId(), mCtrlBlock.getProductId(),
+					mCtrlBlock.getFileDescriptor(),
+					mCtrlBlock.getBusNum(),
+					mCtrlBlock.getDevNum(),
+					getUSBFSName(mCtrlBlock));
+			} catch (final Exception e) {
+				e.printStackTrace();
+				result = -1;
 			}
-			sb.append("core message ->"+e.getLocalizedMessage());
-			result = -1;
-		}
 
-		if (result != 0) {
-			throw new UnsupportedOperationException("open failed:result=" + result+"----->" +
-					"id_camera="+mNativePtr+";venderId="+mCtrlBlock.getVenderId()
-					+";productId="+mCtrlBlock.getProductId()+";fileDescriptor="+mCtrlBlock.getFileDescriptor()
-					+";busNum="+mCtrlBlock.getBusNum()+";devAddr="+mCtrlBlock.getDevNum()
-					+";usbfs="+getUSBFSName(mCtrlBlock)+"\n"+"Exception："+sb.toString());
-		}
-
-    	if (mNativePtr != 0 && TextUtils.isEmpty(mSupportedSize)) {
-    		mSupportedSize = nativeGetSupportedSize(mNativePtr);
-    	}
-		nativeSetPreviewSize(mNativePtr, DEFAULT_PREVIEW_WIDTH, DEFAULT_PREVIEW_HEIGHT,
-			DEFAULT_PREVIEW_MIN_FPS, DEFAULT_PREVIEW_MAX_FPS, DEFAULT_PREVIEW_MODE, DEFAULT_BANDWIDTH);
+			if (result != 0) {
+				throw new UnsupportedOperationException("open failed:result=" + result+"----->" +
+						"id_camera="+mNativePtr+";venderId="+mCtrlBlock.getVenderId()
+						+";productId="+mCtrlBlock.getProductId()+";fileDescriptor="+mCtrlBlock.getFileDescriptor()
+						+";busNum="+mCtrlBlock.getBusNum()+";devAddr="+mCtrlBlock.getDevNum()
+						+";usbfs="+getUSBFSName(mCtrlBlock));
+			}
+			if (mNativePtr != 0 && TextUtils.isEmpty(mSupportedSize)) {
+				mSupportedSize = nativeGetSupportedSize(mNativePtr);
+			}
+			nativeSetPreviewSize(mNativePtr, DEFAULT_PREVIEW_WIDTH, DEFAULT_PREVIEW_HEIGHT,
+				DEFAULT_PREVIEW_MIN_FPS, DEFAULT_PREVIEW_MAX_FPS, DEFAULT_PREVIEW_MODE, DEFAULT_BANDWIDTH);
     }
 
 	/**
@@ -293,7 +284,7 @@ public class UVCCamera {
 		}
 		return result;
 	}
-	
+
 	/**
 	 * Set preview size and preview mode
 	 * @param width
@@ -312,7 +303,7 @@ public class UVCCamera {
 	public void setPreviewSize(final int width, final int height, final int frameFormat) {
 		setPreviewSize(width, height, DEFAULT_PREVIEW_MIN_FPS, DEFAULT_PREVIEW_MAX_FPS, frameFormat, mCurrentBandwidthFactor);
 	}
-	
+
 	/**
 	 * Set preview size and preview mode
 	 * @param width

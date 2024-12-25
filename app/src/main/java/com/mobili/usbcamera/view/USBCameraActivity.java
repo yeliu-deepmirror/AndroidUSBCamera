@@ -82,7 +82,6 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
     public OverlayView mOverlayView;
     private UVCCameraHelper mCameraHelper;
     private CameraViewInterface mUVCCameraView;
-    private UVCCameraTextureView mUVCCameraViewInternal;
     private AlertDialog mDialog;
 
     private boolean isRequest = false;
@@ -160,7 +159,7 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
         // upload the marker image
         try {
             byte[] jpgBytes = mOpenXR.getJpgBytesFromAssets(this, "dm_final.jpg");
-            Log.d(TAG, "Raw Bytes: " + jpgBytes.length);
+            Log.d(TAG, "Read Marker image, Raw Bytes: " + jpgBytes.length);
             mOpenXR.passMarker(jpgBytes);
         } catch (IOException e) {
             e.printStackTrace();
@@ -170,9 +169,6 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
         mOverlayView = findViewById(R.id.overlay_view);
 
         // step.1 initialize UVCCameraHelper
-        mUVCCameraViewInternal = (UVCCameraTextureView) mTextureView;
-        mUVCCameraViewInternal.setKeepRunning(true);
-
         mUVCCameraView = (CameraViewInterface) mTextureView;
         mUVCCameraView.setCallback(this);
         mCameraHelper = UVCCameraHelper.getInstance();
@@ -258,7 +254,14 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
       }
     }
 
+    private int mFrameCnt = 0;
     private boolean saveJpgImage(byte[] data) {
+      // get the focus information
+      mFrameCnt = mFrameCnt + 1;
+      if (mFrameCnt%5 != 0) {
+        return false;
+      }
+
       long timestamp = SystemClock.elapsedRealtimeNanos();
 
       int image_width = mCameraHelper.getHandle().getWidth();
